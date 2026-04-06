@@ -24,6 +24,8 @@ pipeline {
         REGISTRYCREDENTIAL = 'ecr:us-east-1:awscreds'
         APPREGISTRY = '349131272218.dkr.ecr.us-east-1.amazonaws.com/devopsprojectappimg'
         VPROFILEREGISTRY = 'https://349131272218.dkr.ecr.us-east-1.amazonaws.com'
+        CLUSTER = "devopsstaging"
+        SERVICE = "devopstask-service-7pjshifs"
     }
 
     stages {
@@ -115,6 +117,14 @@ pipeline {
                         dockerImage.push("$BUILD_NUMBER")
                         dockerImage.push("latest")
                     }
+                }
+            }
+        }
+
+        stage("Deploy to Staging ECS"){
+            steps{
+                withAWS(credentials: 'awscreds', region : us-east-1){
+                    sh 'aws ecs update-service --cluster ${CLUSTER} --service ${SERVICE} --force-new-deploymeny'
                 }
             }
         }
